@@ -230,7 +230,7 @@ final class HierarchicalUriComponents extends UriComponents {
 						}
 						queryBuilder.append(name);
 						if (value != null) {
-							queryBuilder.append('=').append(value.toString());
+							queryBuilder.append('=').append(value);
 						}
 					}
 				}

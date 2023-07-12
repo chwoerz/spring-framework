@@ -117,13 +117,13 @@ public class InterfaceMaker extends AbstractClassGenerator
                        null,
                        null,
                        Constants.SOURCE_FILE);
-        for (Iterator it = signatures.keySet().iterator(); it.hasNext();) {
-            Signature sig = (Signature)it.next();
-            Type[] exceptions = (Type[])signatures.get(sig);
-            ce.begin_method(Constants.ACC_PUBLIC | Constants.ACC_ABSTRACT,
-                            sig,
-                            exceptions).end_method();
-        }
+		for (Object o : signatures.keySet()) {
+			Signature sig = (Signature) o;
+			Type[] exceptions = (Type[]) signatures.get(sig);
+			ce.begin_method(Constants.ACC_PUBLIC | Constants.ACC_ABSTRACT,
+					sig,
+					exceptions).end_method();
+		}
         ce.end_class();
     }
 }

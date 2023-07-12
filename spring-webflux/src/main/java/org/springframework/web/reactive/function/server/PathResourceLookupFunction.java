@@ -111,10 +111,7 @@ class PathResourceLookupFunction implements Function<ServerRequest, Mono<Resourc
 				return true;
 			}
 		}
-		if (path.contains("..") && StringUtils.cleanPath(path).contains("../")) {
-			return true;
-		}
-		return false;
+		return path.contains("..") && StringUtils.cleanPath(path).contains("../");
 	}
 
 	private boolean isResourceUnderLocation(Resource resource) throws IOException {

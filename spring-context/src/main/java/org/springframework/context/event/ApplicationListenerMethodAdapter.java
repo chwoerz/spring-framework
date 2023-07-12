@@ -219,7 +219,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 		for (Class<?> paramType : method.getParameterTypes()) {
 			sj.add(paramType.getName());
 		}
-		return ClassUtils.getQualifiedMethodName(method) + sj.toString();
+		return ClassUtils.getQualifiedMethodName(method) + sj;
 	}
 
 

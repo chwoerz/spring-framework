@@ -147,11 +147,10 @@ public final class ConstantDynamic {
     if (object == this) {
       return true;
     }
-    if (!(object instanceof ConstantDynamic)) {
+    if (!(object instanceof ConstantDynamic constantDynamic)) {
       return false;
     }
-    ConstantDynamic constantDynamic = (ConstantDynamic) object;
-    return name.equals(constantDynamic.name)
+	  return name.equals(constantDynamic.name)
         && descriptor.equals(constantDynamic.descriptor)
         && bootstrapMethod.equals(constantDynamic.bootstrapMethod)
         && Arrays.equals(bootstrapMethodArguments, constantDynamic.bootstrapMethodArguments);

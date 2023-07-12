@@ -204,7 +204,7 @@ public class OpenSessionInViewInterceptor implements AsyncWebRequestInterceptor 
 	 * of the {@code SessionFactory} instance and appends {@link #PARTICIPATE_SUFFIX}.
 	 */
 	protected String getParticipateAttributeName() {
-		return obtainSessionFactory().toString() + PARTICIPATE_SUFFIX;
+		return obtainSessionFactory() + PARTICIPATE_SUFFIX;
 	}
 
 	private boolean applySessionBindingInterceptor(WebAsyncManager asyncManager, String key) {

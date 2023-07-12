@@ -41,52 +41,52 @@ class LazyLoaderGenerator implements CallbackGenerator {
     @Override
 	public void generate(ClassEmitter ce, Context context, List methods) {
         Set indexes = new HashSet();
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
-            if (TypeUtils.isProtected(method.getModifiers())) {
-                // ignore protected methods
-            } else {
-                int index = context.getIndex(method);
-                indexes.add(index);
-                CodeEmitter e = context.beginMethod(ce, method);
-                e.load_this();
-                e.dup();
-                e.invoke_virtual_this(loadMethod(index));
-                e.checkcast(method.getClassInfo().getType());
-                e.load_args();
-                e.invoke(method);
-                e.return_value();
-                e.end_method();
-            }
-        }
+		for (Object value : methods) {
+			MethodInfo method = (MethodInfo) value;
+			if (TypeUtils.isProtected(method.getModifiers())) {
+				// ignore protected methods
+			} else {
+				int index = context.getIndex(method);
+				indexes.add(index);
+				CodeEmitter e = context.beginMethod(ce, method);
+				e.load_this();
+				e.dup();
+				e.invoke_virtual_this(loadMethod(index));
+				e.checkcast(method.getClassInfo().getType());
+				e.load_args();
+				e.invoke(method);
+				e.return_value();
+				e.end_method();
+			}
+		}
 
-        for (Iterator it = indexes.iterator(); it.hasNext();) {
-            int index = ((Integer)it.next());
+		for (Object o : indexes) {
+			int index = ((Integer) o);
 
-            String delegate = "CGLIB$LAZY_LOADER_" + index;
-            ce.declare_field(Constants.ACC_PRIVATE, delegate, Constants.TYPE_OBJECT, null);
+			String delegate = "CGLIB$LAZY_LOADER_" + index;
+			ce.declare_field(Constants.ACC_PRIVATE, delegate, Constants.TYPE_OBJECT, null);
 
-            CodeEmitter e = ce.begin_method(Constants.ACC_PRIVATE |
-                                            Constants.ACC_SYNCHRONIZED |
-                                            Constants.ACC_FINAL,
-                                            loadMethod(index),
-                                            null);
-            e.load_this();
-            e.getfield(delegate);
-            e.dup();
-            Label end = e.make_label();
-            e.ifnonnull(end);
-            e.pop();
-            e.load_this();
-            context.emitCallback(e, index);
-            e.invoke_interface(LAZY_LOADER, LOAD_OBJECT);
-            e.dup_x1();
-            e.putfield(delegate);
-            e.mark(end);
-            e.return_value();
-            e.end_method();
+			CodeEmitter e = ce.begin_method(Constants.ACC_PRIVATE |
+							Constants.ACC_SYNCHRONIZED |
+							Constants.ACC_FINAL,
+					loadMethod(index),
+					null);
+			e.load_this();
+			e.getfield(delegate);
+			e.dup();
+			Label end = e.make_label();
+			e.ifnonnull(end);
+			e.pop();
+			e.load_this();
+			context.emitCallback(e, index);
+			e.invoke_interface(LAZY_LOADER, LOAD_OBJECT);
+			e.dup_x1();
+			e.putfield(delegate);
+			e.mark(end);
+			e.return_value();
+			e.end_method();
 
-        }
+		}
     }
 
     private Signature loadMethod(int index) {

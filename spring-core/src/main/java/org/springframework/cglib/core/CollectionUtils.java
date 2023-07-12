@@ -52,29 +52,24 @@ public class CollectionUtils {
     }
 
     public static Collection filter(Collection c, Predicate p) {
-        Iterator it = c.iterator();
-        while (it.hasNext()) {
-            if (!p.evaluate(it.next())) {
-                it.remove();
-            }
-        }
+		c.removeIf(o -> !p.evaluate(o));
         return c;
     }
 
     public static List transform(Collection c, Transformer t) {
         List result = new ArrayList(c.size());
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            result.add(t.transform(it.next()));
-        }
+		for (Object o : c) {
+			result.add(t.transform(o));
+		}
         return result;
     }
 
     public static Map getIndexMap(List list) {
         Map indexes = new HashMap();
         int index = 0;
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            indexes.put(it.next(), index++);
-        }
+		for (Object o : list) {
+			indexes.put(o, index++);
+		}
         return indexes;
     }
 }

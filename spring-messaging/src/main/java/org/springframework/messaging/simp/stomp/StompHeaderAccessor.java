@@ -286,7 +286,7 @@ public class StompHeaderAccessor extends SimpMessageHeaderAccessor {
 		String subscriptionId = getSubscriptionId();
 		if (subscriptionId != null) {
 			StompCommand command = getCommand();
-			if (command != null && StompCommand.MESSAGE.equals(command)) {
+			if (StompCommand.MESSAGE.equals(command)) {
 				setNativeHeader(STOMP_SUBSCRIPTION_HEADER, subscriptionId);
 			}
 			else {
@@ -478,7 +478,7 @@ public class StompHeaderAccessor extends SimpMessageHeaderAccessor {
 		}
 		byte[] bytes = (byte[]) payload;
 		MimeType mimeType = getContentType();
-		String contentType = (mimeType != null ? " " + mimeType.toString() : "");
+		String contentType = (mimeType != null ? " " + mimeType : "");
 		if (bytes.length == 0 || mimeType == null || !isReadableContentType()) {
 			return contentType;
 		}

@@ -166,12 +166,13 @@ public class UndertowWebSocketClient implements WebSocketClient {
 					DefaultNegotiation negotiation = new DefaultNegotiation(protocols, headers, builder);
 					builder.setClientNegotiation(negotiation);
 					builder.connect().addNotifier(
-							new IoFuture.HandlingNotifier<WebSocketChannel, Object>() {
+							new IoFuture.HandlingNotifier<>() {
 								@Override
 								public void handleDone(WebSocketChannel channel, Object attachment) {
 									handleChannel(url, ContextWebSocketHandler.decorate(handler, contextView),
 											completion, negotiation, channel);
 								}
+
 								@Override
 								public void handleFailed(IOException ex, Object attachment) {
 									// Ignore result: can't overflow, ok if not first or no one listens

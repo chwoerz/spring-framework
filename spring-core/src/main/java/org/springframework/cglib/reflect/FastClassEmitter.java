@@ -220,9 +220,9 @@ class FastClassEmitter extends ClassEmitter {
         public GetIndexCallback(CodeEmitter e, List methods) {
             this.e = e;
             int index = 0;
-            for (Iterator it = methods.iterator(); it.hasNext();) {
-                indexes.put(it.next(), index++);
-            }
+			for (Object method : methods) {
+				indexes.put(method, index++);
+			}
         }
 
         @Override

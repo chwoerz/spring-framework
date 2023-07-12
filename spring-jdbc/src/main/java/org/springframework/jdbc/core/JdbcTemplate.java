@@ -718,7 +718,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		Assert.notNull(rse, "ResultSetExtractor must not be null");
 		logger.debug("Executing prepared SQL query");
 
-		return execute(psc, new PreparedStatementCallback<T>() {
+		return execute(psc, new PreparedStatementCallback<>() {
 			@Override
 			@Nullable
 			public T doInPreparedStatement(PreparedStatement ps) throws SQLException {
@@ -729,8 +729,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					}
 					rs = ps.executeQuery();
 					return rse.extractData(rs);
-				}
-				finally {
+				} finally {
 					JdbcUtils.closeResultSet(rs);
 					if (pss instanceof ParameterDisposer parameterDisposer) {
 						parameterDisposer.cleanupParameters();

@@ -88,7 +88,7 @@ class Token {
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append('[').append(this.kind.toString());
+		s.append('[').append(this.kind);
 		if (this.kind.hasPayload()) {
 			s.append(':').append(this.data);
 		}

@@ -35,15 +35,15 @@ class FixedValueGenerator implements CallbackGenerator {
 
     @Override
 	public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
-            CodeEmitter e = context.beginMethod(ce, method);
-            context.emitCallback(e, context.getIndex(method));
-            e.invoke_interface(FIXED_VALUE, LOAD_OBJECT);
-            e.unbox_or_zero(e.getReturnType());
-            e.return_value();
-            e.end_method();
-        }
+		for (Object o : methods) {
+			MethodInfo method = (MethodInfo) o;
+			CodeEmitter e = context.beginMethod(ce, method);
+			context.emitCallback(e, context.getIndex(method));
+			e.invoke_interface(FIXED_VALUE, LOAD_OBJECT);
+			e.unbox_or_zero(e.getReturnType());
+			e.return_value();
+			e.end_method();
+		}
     }
 
     @Override

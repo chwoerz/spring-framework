@@ -155,7 +155,7 @@ public final class BindMarkersFactoryResolver {
 			if (builder.length() == 0) {
 				return "";
 			}
-			return "_" + builder.toString();
+			return "_" + builder;
 		}
 	}
 

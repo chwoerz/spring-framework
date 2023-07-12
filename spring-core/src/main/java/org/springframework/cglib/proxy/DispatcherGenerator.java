@@ -49,24 +49,24 @@ class DispatcherGenerator implements CallbackGenerator {
 
     @Override
 	public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
-            if (!TypeUtils.isProtected(method.getModifiers())) {
-                CodeEmitter e = context.beginMethod(ce, method);
-                context.emitCallback(e, context.getIndex(method));
-                if (proxyRef) {
-                    e.load_this();
-                    e.invoke_interface(PROXY_REF_DISPATCHER, PROXY_REF_LOAD_OBJECT);
-                } else {
-                    e.invoke_interface(DISPATCHER, LOAD_OBJECT);
-                }
-                e.checkcast(method.getClassInfo().getType());
-                e.load_args();
-                e.invoke(method);
-                e.return_value();
-                e.end_method();
-            }
-        }
+		for (Object o : methods) {
+			MethodInfo method = (MethodInfo) o;
+			if (!TypeUtils.isProtected(method.getModifiers())) {
+				CodeEmitter e = context.beginMethod(ce, method);
+				context.emitCallback(e, context.getIndex(method));
+				if (proxyRef) {
+					e.load_this();
+					e.invoke_interface(PROXY_REF_DISPATCHER, PROXY_REF_LOAD_OBJECT);
+				} else {
+					e.invoke_interface(DISPATCHER, LOAD_OBJECT);
+				}
+				e.checkcast(method.getClassInfo().getType());
+				e.load_args();
+				e.invoke(method);
+				e.return_value();
+				e.end_method();
+			}
+		}
     }
 
     @Override

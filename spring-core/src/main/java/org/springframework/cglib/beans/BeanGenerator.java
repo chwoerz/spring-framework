@@ -148,10 +148,10 @@ public class BeanGenerator extends AbstractClassGenerator
     }
 
     public static void addProperties(BeanGenerator gen, Map props) {
-        for (Iterator it = props.keySet().iterator(); it.hasNext();) {
-            String name = (String)it.next();
-            gen.addProperty(name, (Class)props.get(name));
-        }
+		for (Object o : props.keySet()) {
+			String name = (String) o;
+			gen.addProperty(name, (Class) props.get(name));
+		}
     }
 
     public static void addProperties(BeanGenerator gen, Class type) {

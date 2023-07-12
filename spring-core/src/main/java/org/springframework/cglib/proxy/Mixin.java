@@ -232,22 +232,22 @@ abstract public class Mixin {
                 Class delegate = delegates[i].getClass();
                 collect.clear();
                 ReflectUtils.addAllInterfaces(delegate, collect);
-                for (Iterator it = collect.iterator(); it.hasNext();) {
-                    Class iface = (Class)it.next();
-                    if (!map.containsKey(iface)) {
-                        map.put(iface, i);
-                    }
-                }
+				for (Object o : collect) {
+					Class iface = (Class) o;
+					if (!map.containsKey(iface)) {
+						map.put(iface, i);
+					}
+				}
             }
             classes = new Class[map.size()];
             route = new int[map.size()];
             int index = 0;
-            for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-                Class key = (Class)it.next();
-                classes[index] = key;
-                route[index] = ((Integer)map.get(key));
-                index++;
-            }
+			for (Object o : map.keySet()) {
+				Class key = (Class) o;
+				classes[index] = key;
+				route[index] = ((Integer) map.get(key));
+				index++;
+			}
         }
     }
 }

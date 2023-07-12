@@ -17,14 +17,7 @@
 package org.springframework.cglib.beans;
 
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.asm.ClassVisitor;
 import org.springframework.cglib.core.AbstractClassGenerator;
@@ -243,12 +236,12 @@ abstract public class BeanMap implements Map {
 
     @Override
 	public boolean containsValue(Object value) {
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
-            Object v = get(it.next());
-            if (((value == null) && (v == null)) || (value != null && value.equals(v))) {
+		for (Object o : keySet()) {
+			Object v = get(o);
+			if (((value == null) && (v == null)) || (value != null && value.equals(v))) {
 				return true;
 			}
-        }
+		}
         return false;
     }
 
@@ -288,7 +281,7 @@ abstract public class BeanMap implements Map {
             }
             Object v1 = get(key);
             Object v2 = other.get(key);
-            if (!((v1 == null) ? v2 == null : v1.equals(v2))) {
+            if (!(Objects.equals(v1, v2))) {
                 return false;
             }
         }
@@ -320,9 +313,9 @@ abstract public class BeanMap implements Map {
 	public Collection values() {
         Set keys = keySet();
         List values = new ArrayList(keys.size());
-        for (Iterator it = keys.iterator(); it.hasNext();) {
-            values.add(get(it.next()));
-        }
+		for (Object key : keys) {
+			values.add(get(key));
+		}
         return Collections.unmodifiableCollection(values);
     }
 

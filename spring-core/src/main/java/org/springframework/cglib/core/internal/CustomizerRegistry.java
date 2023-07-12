@@ -22,11 +22,8 @@ public class CustomizerRegistry {
         Class<? extends KeyFactoryCustomizer> klass = customizer.getClass();
         for (Class type : customizerTypes) {
             if (type.isAssignableFrom(klass)) {
-                List<KeyFactoryCustomizer> list = customizers.get(type);
-                if (list == null) {
-                    customizers.put(type, list = new ArrayList<>());
-                }
-                list.add(customizer);
+				List<KeyFactoryCustomizer> list = customizers.computeIfAbsent(type, k -> new ArrayList<>());
+				list.add(customizer);
             }
         }
     }

@@ -455,37 +455,20 @@ public final class Type {
    * @return the binary name of the class corresponding to this type.
    */
   public String getClassName() {
-    switch (sort) {
-      case VOID:
-        return "void";
-      case BOOLEAN:
-        return "boolean";
-      case CHAR:
-        return "char";
-      case BYTE:
-        return "byte";
-      case SHORT:
-        return "short";
-      case INT:
-        return "int";
-      case FLOAT:
-        return "float";
-      case LONG:
-        return "long";
-      case DOUBLE:
-        return "double";
-      case ARRAY:
-        StringBuilder stringBuilder = new StringBuilder(getElementType().getClassName());
-        for (int i = getDimensions(); i > 0; --i) {
-          stringBuilder.append("[]");
-        }
-        return stringBuilder.toString();
-      case OBJECT:
-      case INTERNAL:
-        return valueBuffer.substring(valueBegin, valueEnd).replace('/', '.');
-      default:
-        throw new AssertionError();
-    }
+	  return switch (sort) {
+		  case VOID -> "void";
+		  case BOOLEAN -> "boolean";
+		  case CHAR -> "char";
+		  case BYTE -> "byte";
+		  case SHORT -> "short";
+		  case INT -> "int";
+		  case FLOAT -> "float";
+		  case LONG -> "long";
+		  case DOUBLE -> "double";
+		  case ARRAY -> getElementType().getClassName() + "[]".repeat(Math.max(0, getDimensions()));
+		  case OBJECT, INTERNAL -> valueBuffer.substring(valueBegin, valueEnd).replace('/', '.');
+		  default -> throw new AssertionError();
+	  };
   }
 
   /**
@@ -681,25 +664,12 @@ public final class Type {
    *     {@code void} and 1 otherwise.
    */
   public int getSize() {
-    switch (sort) {
-      case VOID:
-        return 0;
-      case BOOLEAN:
-      case CHAR:
-      case BYTE:
-      case SHORT:
-      case INT:
-      case FLOAT:
-      case ARRAY:
-      case OBJECT:
-      case INTERNAL:
-        return 1;
-      case LONG:
-      case DOUBLE:
-        return 2;
-      default:
-        throw new AssertionError();
-    }
+	  return switch (sort) {
+		  case VOID -> 0;
+		  case BOOLEAN, CHAR, BYTE, SHORT, INT, FLOAT, ARRAY, OBJECT, INTERNAL -> 1;
+		  case LONG, DOUBLE -> 2;
+		  default -> throw new AssertionError();
+	  };
   }
 
   /**
@@ -769,32 +739,18 @@ public final class Type {
    */
   public int getOpcode(final int opcode) {
     if (opcode == Opcodes.IALOAD || opcode == Opcodes.IASTORE) {
-      switch (sort) {
-        case BOOLEAN:
-        case BYTE:
-          return opcode + (Opcodes.BALOAD - Opcodes.IALOAD);
-        case CHAR:
-          return opcode + (Opcodes.CALOAD - Opcodes.IALOAD);
-        case SHORT:
-          return opcode + (Opcodes.SALOAD - Opcodes.IALOAD);
-        case INT:
-          return opcode;
-        case FLOAT:
-          return opcode + (Opcodes.FALOAD - Opcodes.IALOAD);
-        case LONG:
-          return opcode + (Opcodes.LALOAD - Opcodes.IALOAD);
-        case DOUBLE:
-          return opcode + (Opcodes.DALOAD - Opcodes.IALOAD);
-        case ARRAY:
-        case OBJECT:
-        case INTERNAL:
-          return opcode + (Opcodes.AALOAD - Opcodes.IALOAD);
-        case METHOD:
-        case VOID:
-          throw new UnsupportedOperationException();
-        default:
-          throw new AssertionError();
-      }
+		return switch (sort) {
+			case BOOLEAN, BYTE -> opcode + (Opcodes.BALOAD - Opcodes.IALOAD);
+			case CHAR -> opcode + (Opcodes.CALOAD - Opcodes.IALOAD);
+			case SHORT -> opcode + (Opcodes.SALOAD - Opcodes.IALOAD);
+			case INT -> opcode;
+			case FLOAT -> opcode + (Opcodes.FALOAD - Opcodes.IALOAD);
+			case LONG -> opcode + (Opcodes.LALOAD - Opcodes.IALOAD);
+			case DOUBLE -> opcode + (Opcodes.DALOAD - Opcodes.IALOAD);
+			case ARRAY, OBJECT, INTERNAL -> opcode + (Opcodes.AALOAD - Opcodes.IALOAD);
+			case METHOD, VOID -> throw new UnsupportedOperationException();
+			default -> throw new AssertionError();
+		};
     } else {
       switch (sort) {
         case VOID:
@@ -844,11 +800,10 @@ public final class Type {
     if (this == object) {
       return true;
     }
-    if (!(object instanceof Type)) {
+    if (!(object instanceof Type other)) {
       return false;
     }
-    Type other = (Type) object;
-    if ((sort == INTERNAL ? OBJECT : sort) != (other.sort == INTERNAL ? OBJECT : other.sort)) {
+	  if ((sort == INTERNAL ? OBJECT : sort) != (other.sort == INTERNAL ? OBJECT : other.sort)) {
       return false;
     }
     int begin = valueBegin;

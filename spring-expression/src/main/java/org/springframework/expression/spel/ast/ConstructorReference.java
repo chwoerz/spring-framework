@@ -245,7 +245,7 @@ public class ConstructorReference extends SpelNodeImpl {
 			for (int i = 1; i < count; i++) {
 				sj.add(getChild(i).toStringAST());
 			}
-			sb.append(sj.toString());
+			sb.append(sj);
 		}
 
 		return sb.toString();

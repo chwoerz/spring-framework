@@ -251,9 +251,9 @@ public class EmitUtils {
     static int[] getSwitchKeys(Map buckets) {
         int[] keys = new int[buckets.size()];
         int index = 0;
-        for (Iterator it = buckets.keySet().iterator(); it.hasNext();) {
-            keys[index++] = ((Integer)it.next());
-        }
+		for (Object o : buckets.keySet()) {
+			keys[index++] = ((Integer) o);
+		}
         Arrays.sort(keys);
         return keys;
     }

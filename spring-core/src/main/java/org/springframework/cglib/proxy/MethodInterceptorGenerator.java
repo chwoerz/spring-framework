@@ -91,61 +91,61 @@ implements CallbackGenerator
     @Override
     public void generate(ClassEmitter ce, Context context, List methods) {
         Map sigMap = new HashMap();
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
-            Signature sig = method.getSignature();
-            Signature impl = context.getImplSignature(method);
+		for (Object o : methods) {
+			MethodInfo method = (MethodInfo) o;
+			Signature sig = method.getSignature();
+			Signature impl = context.getImplSignature(method);
 
-            String methodField = getMethodField(impl);
-            String methodProxyField = getMethodProxyField(impl);
+			String methodField = getMethodField(impl);
+			String methodProxyField = getMethodProxyField(impl);
 
-            sigMap.put(sig.toString(), methodProxyField);
-            ce.declare_field(Constants.PRIVATE_FINAL_STATIC, methodField, METHOD, null);
-            ce.declare_field(Constants.PRIVATE_FINAL_STATIC, methodProxyField, METHOD_PROXY, null);
-            ce.declare_field(Constants.PRIVATE_FINAL_STATIC, EMPTY_ARGS_NAME, Constants.TYPE_OBJECT_ARRAY, null);
-            CodeEmitter e;
+			sigMap.put(sig.toString(), methodProxyField);
+			ce.declare_field(Constants.PRIVATE_FINAL_STATIC, methodField, METHOD, null);
+			ce.declare_field(Constants.PRIVATE_FINAL_STATIC, methodProxyField, METHOD_PROXY, null);
+			ce.declare_field(Constants.PRIVATE_FINAL_STATIC, EMPTY_ARGS_NAME, Constants.TYPE_OBJECT_ARRAY, null);
+			CodeEmitter e;
 
-            // access method
-            e = ce.begin_method(Constants.ACC_FINAL,
-                                impl,
-                                method.getExceptionTypes());
-            superHelper(e, method, context);
-            e.return_value();
-            e.end_method();
+			// access method
+			e = ce.begin_method(Constants.ACC_FINAL,
+					impl,
+					method.getExceptionTypes());
+			superHelper(e, method, context);
+			e.return_value();
+			e.end_method();
 
-            // around method
-            e = context.beginMethod(ce, method);
-            Label nullInterceptor = e.make_label();
-            context.emitCallback(e, context.getIndex(method));
-            e.dup();
-            e.ifnull(nullInterceptor);
+			// around method
+			e = context.beginMethod(ce, method);
+			Label nullInterceptor = e.make_label();
+			context.emitCallback(e, context.getIndex(method));
+			e.dup();
+			e.ifnull(nullInterceptor);
 
-            e.load_this();
-            e.getfield(methodField);
+			e.load_this();
+			e.getfield(methodField);
 
-            if (sig.getArgumentTypes().length == 0) {
-                e.getfield(EMPTY_ARGS_NAME);
-            } else {
-                e.create_arg_array();
-            }
+			if (sig.getArgumentTypes().length == 0) {
+				e.getfield(EMPTY_ARGS_NAME);
+			} else {
+				e.create_arg_array();
+			}
 
-            e.getfield(methodProxyField);
-            e.invoke_interface(METHOD_INTERCEPTOR, INTERCEPT);
-            e.unbox_or_zero(sig.getReturnType());
-            e.return_value();
+			e.getfield(methodProxyField);
+			e.invoke_interface(METHOD_INTERCEPTOR, INTERCEPT);
+			e.unbox_or_zero(sig.getReturnType());
+			e.return_value();
 
-            e.mark(nullInterceptor);
-            superHelper(e, method, context);
-            e.return_value();
-            e.end_method();
-        }
+			e.mark(nullInterceptor);
+			superHelper(e, method, context);
+			e.return_value();
+			e.end_method();
+		}
         generateFindProxy(ce, sigMap);
     }
 
     private static void superHelper(CodeEmitter e, MethodInfo method, Context context)
     {
         if (TypeUtils.isAbstract(method.getModifiers())) {
-            e.throw_exception(ABSTRACT_METHOD_ERROR, method.toString() + " is abstract" );
+            e.throw_exception(ABSTRACT_METHOD_ERROR, method + " is abstract" );
         } else {
             e.load_this();
             context.emitLoadArgsAndInvoke(e, method);
@@ -177,50 +177,50 @@ implements CallbackGenerator
         e.store_local(thisclass);
 
         Map methodsByClass = CollectionUtils.bucket(methods, METHOD_TO_CLASS);
-        for (Iterator i = methodsByClass.keySet().iterator(); i.hasNext();) {
-            ClassInfo classInfo = (ClassInfo)i.next();
+		for (Object o : methodsByClass.keySet()) {
+			ClassInfo classInfo = (ClassInfo) o;
 
-            List classMethods = (List)methodsByClass.get(classInfo);
-            e.push(2 * classMethods.size());
-            e.newarray(Constants.TYPE_STRING);
-            for (int index = 0; index < classMethods.size(); index++) {
-                MethodInfo method = (MethodInfo)classMethods.get(index);
-                Signature sig = method.getSignature();
-                e.dup();
-                e.push(2 * index);
-                e.push(sig.getName());
-                e.aastore();
-                e.dup();
-                e.push(2 * index + 1);
-                e.push(sig.getDescriptor());
-                e.aastore();
-            }
+			List classMethods = (List) methodsByClass.get(classInfo);
+			e.push(2 * classMethods.size());
+			e.newarray(Constants.TYPE_STRING);
+			for (int index = 0; index < classMethods.size(); index++) {
+				MethodInfo method = (MethodInfo) classMethods.get(index);
+				Signature sig = method.getSignature();
+				e.dup();
+				e.push(2 * index);
+				e.push(sig.getName());
+				e.aastore();
+				e.dup();
+				e.push(2 * index + 1);
+				e.push(sig.getDescriptor());
+				e.aastore();
+			}
 
-            EmitUtils.load_class(e, classInfo.getType());
-            e.dup();
-            e.store_local(declaringclass);
-            e.invoke_virtual(Constants.TYPE_CLASS, GET_DECLARED_METHODS);
-            e.invoke_static(REFLECT_UTILS, FIND_METHODS);
+			EmitUtils.load_class(e, classInfo.getType());
+			e.dup();
+			e.store_local(declaringclass);
+			e.invoke_virtual(Constants.TYPE_CLASS, GET_DECLARED_METHODS);
+			e.invoke_static(REFLECT_UTILS, FIND_METHODS);
 
-            for (int index = 0; index < classMethods.size(); index++) {
-                MethodInfo method = (MethodInfo)classMethods.get(index);
-                Signature sig = method.getSignature();
-                Signature impl = context.getImplSignature(method);
-                e.dup();
-                e.push(index);
-                e.array_load(METHOD);
-                e.putfield(getMethodField(impl));
+			for (int index = 0; index < classMethods.size(); index++) {
+				MethodInfo method = (MethodInfo) classMethods.get(index);
+				Signature sig = method.getSignature();
+				Signature impl = context.getImplSignature(method);
+				e.dup();
+				e.push(index);
+				e.array_load(METHOD);
+				e.putfield(getMethodField(impl));
 
-                e.load_local(declaringclass);
-                e.load_local(thisclass);
-                e.push(sig.getDescriptor());
-                e.push(sig.getName());
-                e.push(impl.getName());
-                e.invoke_static(METHOD_PROXY, MAKE_PROXY);
-                e.putfield(getMethodProxyField(impl));
-            }
-            e.pop();
-        }
+				e.load_local(declaringclass);
+				e.load_local(thisclass);
+				e.push(sig.getDescriptor());
+				e.push(sig.getName());
+				e.push(impl.getName());
+				e.invoke_static(METHOD_PROXY, MAKE_PROXY);
+				e.putfield(getMethodProxyField(impl));
+			}
+			e.pop();
+		}
     }
 
     public void generateFindProxy(ClassEmitter ce, final Map sigMap) {

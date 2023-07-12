@@ -185,7 +185,7 @@ public class UndertowXhrTransport extends AbstractXhrTransport {
 		return new ClientCallback<>() {
 			@Override
 			public void completed(final ClientExchange exchange) {
-				exchange.setResponseListener(new ClientCallback<ClientExchange>() {
+				exchange.setResponseListener(new ClientCallback<>() {
 					@Override
 					public void completed(ClientExchange result) {
 						ClientResponse response = result.getResponse();
@@ -193,8 +193,7 @@ public class UndertowXhrTransport extends AbstractXhrTransport {
 							HttpStatusCode status = HttpStatusCode.valueOf(response.getResponseCode());
 							IoUtils.safeClose(result.getConnection());
 							onFailure(new HttpServerErrorException(status, "Unexpected XHR receive status"));
-						}
-						else {
+						} else {
 							SockJsResponseListener listener = new SockJsResponseListener(
 									transportRequest, result.getConnection(), url, headers,
 									sockJsSession, connectFuture);
@@ -210,8 +209,7 @@ public class UndertowXhrTransport extends AbstractXhrTransport {
 								channel.getWriteSetter().set(ChannelListeners.<StreamSinkChannel>flushingChannelListener(null, null));
 								channel.resumeWrites();
 							}
-						}
-						catch (IOException exc) {
+						} catch (IOException exc) {
 							IoUtils.safeClose(result.getConnection());
 							onFailure(exc);
 						}
@@ -312,7 +310,7 @@ public class UndertowXhrTransport extends AbstractXhrTransport {
 		return new ClientCallback<>() {
 			@Override
 			public void completed(ClientExchange result) {
-				result.setResponseListener(new ClientCallback<ClientExchange>() {
+				result.setResponseListener(new ClientCallback<>() {
 					@Override
 					public void completed(final ClientExchange result) {
 						responses.add(result.getResponse());
@@ -322,12 +320,14 @@ public class UndertowXhrTransport extends AbstractXhrTransport {
 								result.getResponse().putAttachment(RESPONSE_BODY, string);
 								latch.countDown();
 							}
+
 							@Override
 							protected void error(IOException ex) {
 								onFailure(latch, ex);
 							}
 						}.setup(result.getResponseChannel());
 					}
+
 					@Override
 					public void failed(IOException ex) {
 						onFailure(latch, ex);

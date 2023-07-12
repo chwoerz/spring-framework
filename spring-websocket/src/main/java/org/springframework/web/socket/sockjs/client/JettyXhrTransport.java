@@ -161,20 +161,16 @@ public class JettyXhrTransport extends AbstractXhrTransport implements Lifecycle
 
 
 	private static void addHttpHeaders(Request request, HttpHeaders headers) {
-		request.headers(fields -> {
-			headers.forEach((key, values) -> {
-				for (String value : values) {
-					fields.add(key, value);
-				}
-			});
-		});
+		request.headers(fields -> headers.forEach((key, values) -> {
+			for (String value : values) {
+				fields.add(key, value);
+			}
+		}));
 	}
 
 	private static HttpHeaders toHttpHeaders(HttpFields httpFields) {
 		HttpHeaders responseHeaders = new HttpHeaders();
-		Iterator<String> names = httpFields.getFieldNamesCollection().iterator();
-		while (names.hasNext()) {
-			String name = names.next();
+		for (String name : httpFields.getFieldNamesCollection()) {
 			Enumeration<String> values = httpFields.getValues(name);
 			while (values.hasMoreElements()) {
 				String value = values.nextElement();

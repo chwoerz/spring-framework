@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -182,18 +183,15 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 		if (element.hasAttribute(SCOPED_PROXY_ATTRIBUTE)) {
 			String mode = element.getAttribute(SCOPED_PROXY_ATTRIBUTE);
-			if ("targetClass".equals(mode)) {
-				scanner.setScopedProxyMode(ScopedProxyMode.TARGET_CLASS);
-			}
-			else if ("interfaces".equals(mode)) {
-				scanner.setScopedProxyMode(ScopedProxyMode.INTERFACES);
-			}
-			else if ("no".equals(mode)) {
-				scanner.setScopedProxyMode(ScopedProxyMode.NO);
-			}
-			else {
-				throw new IllegalArgumentException("scoped-proxy only supports 'no', 'interfaces' and 'targetClass'");
-			}
+			ScopedProxyMode scopedProxyMode = switch (mode) {
+				case "targetClass" -> ScopedProxyMode.TARGET_CLASS;
+				case "interfaces" -> ScopedProxyMode.INTERFACES;
+				case "no" -> ScopedProxyMode.NO;
+				default ->
+						throw new IllegalArgumentException("scoped-proxy only supports 'no', 'interfaces' and 'targetClass'");
+			};
+
+			scanner.setScopedProxyMode(scopedProxyMode);
 		}
 	}
 
@@ -234,29 +232,25 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		String filterType = element.getAttribute(FILTER_TYPE_ATTRIBUTE);
 		String expression = element.getAttribute(FILTER_EXPRESSION_ATTRIBUTE);
 		expression = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(expression);
-		if ("annotation".equals(filterType)) {
-			return new AnnotationTypeFilter((Class<Annotation>) ClassUtils.forName(expression, classLoader));
+		return switch (filterType) {
+			case "annotation" ->
+					new AnnotationTypeFilter((Class<Annotation>) ClassUtils.forName(expression, classLoader));
+			case "assignable" -> new AssignableTypeFilter(ClassUtils.forName(expression, classLoader));
+			case "aspectj" -> new AspectJTypeFilter(expression, classLoader);
+			case "regex" -> new RegexPatternTypeFilter(Pattern.compile(expression));
+			case "custom" -> getCustomTypeFilter(classLoader, expression);
+			default -> throw new IllegalArgumentException("Unsupported filter type: " + filterType);
+		};
+	}
+
+	@NotNull
+	private static TypeFilter getCustomTypeFilter(ClassLoader classLoader, String expression) throws ClassNotFoundException {
+		Class<?> filterClass = ClassUtils.forName(expression, classLoader);
+		if (!TypeFilter.class.isAssignableFrom(filterClass)) {
+			throw new IllegalArgumentException(
+					"Class is not assignable to [" + TypeFilter.class.getName() + "]: " + expression);
 		}
-		else if ("assignable".equals(filterType)) {
-			return new AssignableTypeFilter(ClassUtils.forName(expression, classLoader));
-		}
-		else if ("aspectj".equals(filterType)) {
-			return new AspectJTypeFilter(expression, classLoader);
-		}
-		else if ("regex".equals(filterType)) {
-			return new RegexPatternTypeFilter(Pattern.compile(expression));
-		}
-		else if ("custom".equals(filterType)) {
-			Class<?> filterClass = ClassUtils.forName(expression, classLoader);
-			if (!TypeFilter.class.isAssignableFrom(filterClass)) {
-				throw new IllegalArgumentException(
-						"Class is not assignable to [" + TypeFilter.class.getName() + "]: " + expression);
-			}
-			return (TypeFilter) BeanUtils.instantiateClass(filterClass);
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported filter type: " + filterType);
-		}
+		return (TypeFilter) BeanUtils.instantiateClass(filterClass);
 	}
 
 	@SuppressWarnings("unchecked")

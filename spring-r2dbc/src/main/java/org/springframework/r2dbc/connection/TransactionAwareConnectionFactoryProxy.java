@@ -169,7 +169,7 @@ public class TransactionAwareConnectionFactoryProxy extends DelegatingConnection
 
 		private String proxyToString(@Nullable Object proxy) {
 			// Allow for differentiating between the proxy and the raw Connection.
-			return "Transaction-aware proxy for target Connection [" + this.connection.toString() + "]";
+			return "Transaction-aware proxy for target Connection [" + this.connection + "]";
 		}
 
 	}

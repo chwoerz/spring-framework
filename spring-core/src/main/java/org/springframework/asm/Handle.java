@@ -157,11 +157,10 @@ public final class Handle {
     if (object == this) {
       return true;
     }
-    if (!(object instanceof Handle)) {
+    if (!(object instanceof Handle handle)) {
       return false;
     }
-    Handle handle = (Handle) object;
-    return tag == handle.tag
+	  return tag == handle.tag
         && isInterface == handle.isInterface
         && owner.equals(handle.owner)
         && name.equals(handle.name)

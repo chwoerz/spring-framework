@@ -2027,7 +2027,7 @@ final class MethodWriter extends MethodVisitor {
     if (source != symbolTable.getSource()
         || descriptorIndex != this.descriptorIndex
         || signatureIndex != this.signatureIndex
-        || hasDeprecatedAttribute != ((accessFlags & Opcodes.ACC_DEPRECATED) != 0)) {
+        || hasDeprecatedAttribute == ((accessFlags & Opcodes.ACC_DEPRECATED) == 0)) {
       return false;
     }
     boolean needSyntheticAttribute =

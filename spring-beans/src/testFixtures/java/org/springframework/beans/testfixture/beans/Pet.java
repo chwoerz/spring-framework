@@ -18,6 +18,8 @@ package org.springframework.beans.testfixture.beans;
 
 import org.springframework.lang.Nullable;
 
+import java.util.Objects;
+
 /**
  * @author Rob Harrop
  * @since 2.0
@@ -50,7 +52,7 @@ public class Pet {
 
 		final Pet pet = (Pet) o;
 
-		if (name != null ? !name.equals(pet.name) : pet.name != null) {
+		if (!Objects.equals(name, pet.name)) {
 			return false;
 		}
 

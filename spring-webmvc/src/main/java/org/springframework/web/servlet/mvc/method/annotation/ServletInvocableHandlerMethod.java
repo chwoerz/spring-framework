@@ -191,7 +191,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	private String formatErrorForReturnValue(@Nullable Object returnValue) {
 		return "Error handling return value=[" + returnValue + "]" +
 				(returnValue != null ? ", type=" + returnValue.getClass().getName() : "") +
-				" in " + toString();
+				" in " + this;
 	}
 
 	/**

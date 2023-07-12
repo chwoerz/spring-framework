@@ -32,18 +32,18 @@ implements CallbackGenerator
 
     @Override
 	public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
-            if (TypeUtils.isBridge(method.getModifiers()) || (
-                    TypeUtils.isProtected(context.getOriginalModifiers(method)) &&
-                    TypeUtils.isPublic(method.getModifiers()))) {
-                CodeEmitter e = EmitUtils.begin_method(ce, method);
-                e.load_this();
-                context.emitLoadArgsAndInvoke(e, method);
-                e.return_value();
-                e.end_method();
-            }
-        }
+		for (Object o : methods) {
+			MethodInfo method = (MethodInfo) o;
+			if (TypeUtils.isBridge(method.getModifiers()) || (
+					TypeUtils.isProtected(context.getOriginalModifiers(method)) &&
+							TypeUtils.isPublic(method.getModifiers()))) {
+				CodeEmitter e = EmitUtils.begin_method(ce, method);
+				e.load_this();
+				context.emitLoadArgsAndInvoke(e, method);
+				e.return_value();
+				e.end_method();
+			}
+		}
     }
 
     @Override

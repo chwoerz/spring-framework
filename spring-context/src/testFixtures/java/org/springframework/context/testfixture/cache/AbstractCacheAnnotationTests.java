@@ -446,7 +446,7 @@ public abstract class AbstractCacheAnnotationTests {
 
 	protected void testMultiEvict(CacheableService<?> service) {
 		Object o1 = new Object();
-		Object o2 = o1.toString() + "A";
+		Object o2 = o1 + "A";
 
 
 		Object r1 = service.multiCache(o1);

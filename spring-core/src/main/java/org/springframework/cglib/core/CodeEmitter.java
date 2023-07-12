@@ -629,9 +629,9 @@ public class CodeEmitter extends LocalVariablesSorter {
                 if (useTable) {
                     Label[] labels = new Label[range];
                     Arrays.fill(labels, def);
-                    for (int i = 0; i < len; i++) {
-                        labels[keys[i] - min] = make_label();
-                    }
+					for (int key : keys) {
+						labels[key - min] = make_label();
+					}
                     mv.visitTableSwitchInsn(min, max, def, labels);
                     for (int i = 0; i < range; i++) {
                         Label label = labels[i];

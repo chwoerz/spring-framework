@@ -179,9 +179,9 @@ public class TypeUtils {
         String methodName = s.substring(space + 1, lparen);
 		StringBuilder sb = new StringBuilder();
         sb.append('(');
-        for (Iterator it = parseTypes(s, lparen + 1, rparen).iterator(); it.hasNext();) {
-            sb.append(it.next());
-        }
+		for (Object o : parseTypes(s, lparen + 1, rparen)) {
+			sb.append(o);
+		}
         sb.append(')');
         sb.append(map(returnType));
         return new Signature(methodName, sb.toString());

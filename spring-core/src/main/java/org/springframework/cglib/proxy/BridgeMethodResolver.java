@@ -57,24 +57,23 @@ class BridgeMethodResolver {
      */
     public Map/*<Signature, Signature>*/resolveAll() {
         Map resolved = new HashMap();
-        for (Iterator entryIter = declToBridge.entrySet().iterator(); entryIter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) entryIter.next();
-            Class owner = (Class) entry.getKey();
-            Set bridges = (Set) entry.getValue();
-            try {
-                InputStream is = classLoader.getResourceAsStream(owner.getName().replace('.', '/') + ".class");
-                if (is == null) {
-                    return resolved;
-                }
-                try {
-                    new ClassReader(is)
-                            .accept(new BridgedFinder(bridges, resolved),
-                                    ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-                } finally {
-                    is.close();
-                }
-            } catch (IOException ignored) {}
-        }
+		for (Object o : declToBridge.entrySet()) {
+			Map.Entry entry = (Map.Entry) o;
+			Class owner = (Class) entry.getKey();
+			Set bridges = (Set) entry.getValue();
+			try {
+				InputStream is = classLoader.getResourceAsStream(owner.getName().replace('.', '/') + ".class");
+				try (is) {
+					if (is == null) {
+						return resolved;
+					}
+					new ClassReader(is)
+							.accept(new BridgedFinder(bridges, resolved),
+									ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+				}
+			} catch (IOException ignored) {
+			}
+		}
         return resolved;
     }
 
